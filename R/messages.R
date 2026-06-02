@@ -419,6 +419,22 @@ messages$missingPlotType <- function() {
   )
 }
 
+messages$missingOrWrongPlotType <- function(plotType) {
+  if (is.null(plotType)) {
+    return(messages$missingPlotType())
+  }
+  cliFormat(
+    "Wrong values found in mandatory column {.val plotType} of sheet {.var plotConfiguration}: {.val {plotType}}.",
+    "Allowed values are: {.val {c('individual', 'population', 'observedVsSimulated', 'residualsVsSimulated', 'residualsVsTime')}}"
+  )
+}
+
+messages$wrongPlotTypeInPlotConfiguration <- function(plotType) {
+  cliFormat(
+    "{.field plotType} ({.val {plotType}}) is not one of {.val {c('timeProfiles', 'spiderPlot', 'tornadoPlot')}}"
+  )
+}
+
 messages$missingDataType <- function() {
   cliFormat(
     "Missing values found in mandatory column {.val dataType} of sheet {.var DataCombined}. Fill in values to proceed."
@@ -484,23 +500,8 @@ messages$invalidConfigurationPropertyFromExcel <- function(
   configurationType
 ) {
   cliFormat(
-    "Trying to apply property {.arg {propertyName}} that is not supported by 
-    the configuration {.var {configurationType}}! Check column names in the 
-    excel file defining plot configurations."
-  )
-}
-
-messages$missingOutputFileName <- function() {
-  cliFormat(
-    "Missing values found in mandatory column {.arg outputName} of sheet {.var exportConfiguration}. No plots are exported to file for corresponding rows."
-  )
-}
-
-messages$missingPlotGrids <- function(missingPlotGrids) {
-  cliFormat(
-    "Invalid values in column {.arg plotGridName} of sheet {.var exportConfiguration}:
-    {.val {paste0(missingPlotGrids, collapse = ',\n')}}. Plot grids are either not defined or empty and can not be
-    exported to file."
+    "Trying to apply property {.arg {propertyName}} that is not supported by the configuration {.var {configurationType}}!",
+    "Check column names in the excel file defining plot configurations."
   )
 }
 
@@ -544,11 +545,9 @@ messages$sensitivityAnalysisSimulationFailure <- function(
   parameterPath,
   parameterFactor
 ) {
-  cat(
-    cliFormat(
-      "Simulation for {.var {parameterPath}} with variation factor {.val {parameterFactor}} failed!
-      The results will not be included in the sensitivity calculation."
-    )
+  cliFormat(
+    "Simulation for {.var {parameterPath}} with variation factor {.val {parameterFactor}} failed!
+    The results will not be included in the sensitivity calculation."
   )
 }
 
@@ -611,7 +610,7 @@ messages$excelFieldFormatError <- function(
   plotID,
   expectedFormat
 ) {
-  plotInfo <- if (!is.null(plotID)) paste0(" in plot {.val {plotID}}") else ""
+  plotInfo <- if (!is.null(plotID)) cliFormat(" in plot {.val {plotID}}") else ""
   cliFormat(
     "Excel validation error{plotInfo}: Invalid format for {.field {fieldName}}.
     Provided: {.val {value}}
@@ -627,13 +626,11 @@ messages$excelFieldLengthError <- function(
   expected,
   actual
 ) {
-  plotInfo <- if (!is.null(plotID)) paste0(" in plot {.val {plotID}}") else ""
-  valuePlural <- if (actual != 1) "s" else ""
-  expectedPlural <- if (expected != 1) "s" else ""
+  plotInfo <- if (!is.null(plotID)) cliFormat(" in plot {.val {plotID}}") else ""
   cliFormat(
     "Excel validation error{plotInfo}: Wrong number of values for {.field {fieldName}}.
-    Provided: {.val {value}} ({actual} value{valuePlural})
-    Expected: {expected} comma-separated value{expectedPlural}
+    Provided: {.val {value}} ({actual} value{?s})
+    Expected: {expected} comma-separated value{?s}
     Example: '72, 80'"
   )
 }
@@ -644,7 +641,7 @@ messages$excelFieldTypeError <- function(
   plotID,
   expectedType
 ) {
-  plotInfo <- if (!is.null(plotID)) paste0(" in plot {.val {plotID}}") else ""
+  plotInfo <- if (!is.null(plotID)) cliFormat(" in plot {.val {plotID}}") else ""
   cliFormat(
     "Excel validation error{plotInfo}: Invalid {.field {fieldName}} value.
     Provided: {.val {value}}
@@ -762,4 +759,150 @@ messages$abortedByUser <- function() {
   cliFormat(
     "Aborted by user."
   )
+}
+
+messages$errorPIColumnRequired <- function(columnName, sheetName) {
+  cliFormat(
+    "{.field {columnName}} column is required in {.sheet {sheetName}} sheet."
+  )
+}
+
+messages$errorPIDatasetNotFound <- function(datasetName, availableDatasets) {
+  cli::format_message(c(
+    "x" = "Dataset {.val {datasetName}} not found",
+    "i" = "Available datasets: {.val {paste(availableDatasets, collapse = ', ')}}"
+  ))
+}
+
+messages$errorPIGroupBoundsMismatch <- function(group, paramPath) {
+  cliFormat(
+    "Parameter {.val {paramPath}} in group {.val {group}} has different bounds.
+    All parameters in a group must have identical bounds."
+  )
+}
+
+messages$errorPIInvalidBounds <- function(paramPath, min, start, max) {
+  cliFormat(
+    "Parameter {.val {paramPath}} has invalid bounds: Min={.val {min}}, Start={.val {start}}, Max={.val {max}}.
+    Expected: Min <= Start <= Max"
+  )
+}
+
+messages$errorPIInvalidWeightString <- function(weightString) {
+  cliFormat(
+    "Weight value {.val {weightString}} cannot be parsed as numeric.
+    Expected a number or comma-separated numbers, e.g. {.code 1} or {.code 1,2,3}."
+  )
+}
+
+messages$errorPIWeightMustBePositive <- function(weightString) {
+  cliFormat(
+    "Weight values must be non-negative (>= 0). Got: {.val {weightString}}."
+  )
+}
+
+messages$errorPIMissingPiDefinitionsKeys <- function(missingKeys) {
+  cliFormat(
+    "{.arg piDefinitions} must contain: {.val {c('piConfiguration', 'piParameters', 'piOutputMappings')}}.
+    Missing: {.val {paste(missingKeys, collapse = ', ')}}"
+  )
+}
+
+messages$errorPIMissingSheetsInFile <- function(missingSheets, filePath) {
+  cliFormat(
+    "Required sheet(s) missing in {.file {filePath}}: {.val {paste(missingSheets, collapse = ', ')}}.
+    ParameterIdentification.xlsx must contain: PIOutputMappings, PIParameters"
+  )
+}
+
+messages$errorPINoOutputPathsFound <- function() {
+  cliFormat(
+    "No output paths found for PI output mapping.
+    Ensure the scenario has {.field OutputPathsIds} defined in {.file Scenarios.xlsx}."
+  )
+}
+
+messages$errorPIOutputPathIdNotFound <- function(outputPathId) {
+  cliFormat(
+    "{.val {outputPathId}} specified in {.field PIOutputMappings} is not a simulation output path and is not
+    present in the {.field OutputPaths} sheet of {.file Scenarios.xlsx}. Define it in the {.field OutputPaths}
+    sheet or use a full simulation output path."
+  )
+}
+
+messages$errorPIDuplicateOutputPathId <- function(outputPathId) {
+  cliFormat(
+    "{.field OutputPathId} {.val {outputPathId}} has multiple entries in the {.sheet OutputPaths} sheet of {.file Scenarios.xlsx}.
+    Each {.field OutputPathId} must be unique."
+  )
+}
+
+messages$errorPINoScenariosConfigured <- function() {
+  cliFormat(
+    "No scenarios configured for PI tasks.
+    PI tasks require at least one scenario defined in {.file Scenarios.xlsx}."
+  )
+}
+
+messages$errorPIOutputQuantityNotFound <- function(path, simulationName) {
+  cliFormat(
+    "Output quantity {.path {path}} not found in simulation {.val {simulationName}}.
+    Check that the output path exists in the simulation."
+  )
+}
+
+messages$errorPIParameterNotFound <- function(path, simulationName) {
+  cliFormat(
+    "Parameter {.path {path}} not found in simulation {.val {simulationName}}.
+    Check that the parameter path is correct and exists in the simulation."
+  )
+}
+
+messages$errorPIScenarioNotFound <- function(scenarioName, availableScenarios) {
+  cli::format_message(c(
+    "x" = "Scenario {.val {scenarioName}} referenced in PI task configuration not found",
+    "i" = "Available scenarios: {.val {paste(availableScenarios, collapse = ', ')}}"
+  ))
+}
+
+messages$errorPITaskMissingInSheet <- function(taskName, sheetName) {
+  cliFormat(
+    "PI task {.val {taskName}} not found in {.val {sheetName}} sheet"
+  )
+}
+
+messages$errorPITaskNotFound <- function(taskNames, availableTasks) {
+  cli::format_message(c(
+    "x" = "PI task(s) not found: {.val {paste(taskNames, collapse = ', ')}}",
+    "i" = "Available PI tasks: {.val {paste(availableTasks, collapse = ', ')}}"
+  ))
+}
+
+messages$errorPITooManyRowsInSheet <- function(
+  taskName,
+  sheetName,
+  maxRows,
+  nRows
+) {
+  cliFormat(
+    "Too many entries for PI task {.val {taskName}} in {.val {sheetName}} sheet.
+    Expected at most {.val {maxRows}} row(s), found {.val {nRows}}"
+  )
+}
+
+messages$warningPIOptimizationFailed <- function(piTaskName, errorMessage) {
+  cliFormat(
+    "Parameter identification task {.val {piTaskName}} failed: {.emph {errorMessage}}"
+  )
+}
+
+messages$messageRunningPITask <- function(piTaskName) {
+  cliFormat("Running PI task: {.val {piTaskName}}")
+}
+
+messages$conflictingAxesScales <- function(plotID) {
+  cli::format_message(c(
+    "x" = "{.strong observedVsSimulated} plot with plotID {.val {plotID}} has conflicting {.field xAxisScale} and {.field yAxisScale}",
+    "i" = "Use either {.val linear} or {.val log} in both columns"
+  ))
 }

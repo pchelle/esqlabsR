@@ -1,7 +1,7 @@
 Type: Package
 Package: esqlabsR
 Title: ESQlabs utilities package
-Version: 5.6.0.9003
+Version: 5.6.0.9008
 Authors@R: c(
     person("ESQlabs GmbH", role = c("cph", "fnd")),
     person("Pavel", "Balazki", , "pavel.balazki@esqlabs.com", role = c("cre", "aut"),
@@ -19,7 +19,7 @@ License: GPL-2
 URL: https://github.com/esqLABS/esqlabsR, https://esqlabs.github.io/esqlabsR/
 BugReports: https://github.com/esqLABS/esqlabsR/issues
 Depends:
-    ospsuite (>= 12.2.0),
+    ospsuite (>= 12.4.2),
     R (>= 4.4)
 Imports:
     colorspace,
@@ -31,6 +31,7 @@ Imports:
     jsonlite,
     lifecycle,
     methods,
+    ospsuite.parameteridentification,
     parallel,
     patchwork,
     purrr,
@@ -39,28 +40,30 @@ Imports:
     scales,
     stringr,
     tidyr,
-    tlf (>= 1.6.0),
     ospsuite.utils (>= 1.10.0),
     tools,
     usethis,
     vctrs,
-    writexl
-Suggests:
+    writexl,
+    ospsuite.plots (>= 1.0.1.9009),
+    ggtext
+Suggests: 
     clipr,
     covr,
     devtools,
     knitr,
     openxlsx,
+    quarto,
     reactable,
     rmarkdown,
     rlang,
-    showtext,
     testthat (>= 3.0.0),
     vdiffr (>= 1.0.0),
     withr,
     emoji
 VignetteBuilder:
-    knitr
+    knitr,
+    quarto
 Config/testthat/edition: 3
 Config/rcmdcheck/ignore-inconsequential-notes: true
 Encoding: UTF-8
@@ -68,6 +71,7 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Remotes: 
-    ospsuite=Open-Systems-Pharmacology/OSPSuite-R,
     ospsuite.utils=Open-Systems-Pharmacology/OSPSuite.RUtils,
-    tlf=Open-Systems-Pharmacology/TLF-Library
+    ospsuite=Open-Systems-Pharmacology/OSPSuite-R,
+    ospsuite.plots=Open-Systems-Pharmacology/OSPSuite.Plots,
+    ospsuite.parameteridentification=Open-Systems-Pharmacology/OSPSuite.ParameterIdentification
